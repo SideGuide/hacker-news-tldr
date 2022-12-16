@@ -1,6 +1,7 @@
 "use client";
 
 import { getResponseFromAI } from '@/utils/ai_wrapper';
+import { analyticsInstance } from '@/utils/analytics';
 import { fetchHN } from '@/utils/hacker_news_api';
 import { generatePromptToSummarize } from '@/utils/prompts';
 import React, { useState } from 'react'
@@ -69,6 +70,12 @@ export default function Hero() {
             const curated: HNStoryCurated = { title: article.title, text: article.text ?? "", comments: commentsText };
 
             const summary = await getResponseFromAI(generatePromptToSummarize(curated));
+            analyticsInstance.track('summarize', {
+                articleLink: link,
+                id: id,
+                summary: summary,
+                fastMode: fastMode,
+            });
             setSummary(summary);
 
 
