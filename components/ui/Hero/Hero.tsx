@@ -143,6 +143,7 @@ export default function Hero() {
                 >
                     <ReactMarkdown className='prose text-black'>{summary === "" ? "Summary will appear here..." : summary}</ReactMarkdown>
                 </div>}
+                <p className='self-center text-center text-xs mt-1 text-gray-500'>Chrome extension coming soon...</p>
             </div>
         </div>
     );

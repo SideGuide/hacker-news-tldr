@@ -4,7 +4,7 @@ export default function Footer() {
     return (
         <footer className="text-black bg-white body-font tails-selected-element" >
             <div className="container flex flex-col items-center px-8 py-8 mx-auto max-w-7xl sm:flex-row">
-                <a href="#_" className="text-lg font-bold leading-none text-gray-700 select-none logo">Made by SideGuide</a>
+                <a href="https://sideguide.dev" className="text-lg font-bold leading-none text-gray-700 select-none logo">Made by SideGuide</a>
                 <p className="mt-4 text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l sm:border-gray-200 sm:mt-0">© 2022 SideGuide - SideGuide Technologies Inc.
                 </p>
                 <span className="inline-flex justify-center mt-4 space-x-5 sm:ml-auto sm:mt-0 sm:justify-start">
