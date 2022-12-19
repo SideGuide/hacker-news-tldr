@@ -103,7 +103,9 @@ export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
                 fastMode: fastMode,
             });
             setSummary(summary);
-            setIsLoading(false)
+            setIsLoading(false);
+            // set the query param to be the id
+            window.history.pushState({}, '', `/${id}`);
 
             // save on the supabase 'hn-articles' database
             const { data, error } = await client.from('hn-articles').insert([
