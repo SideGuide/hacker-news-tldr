@@ -51,6 +51,7 @@ export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
         if (data && data.length > 0) {
             setSummary(data[0].summary);
             setIsLoading(false);
+            setArticleTitle(data[0].title);
             return true;
         }
         return data;
