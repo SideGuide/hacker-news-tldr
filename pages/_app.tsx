@@ -9,7 +9,11 @@ import { AppProps } from 'next/app';
 import { Analytics } from '@vercel/analytics/react';
 import { usePostHog } from 'next-use-posthog';
 
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const [supabase] = useState(() => createBrowserSupabaseClient())
 
   useEffect(() => {
     document.body.classList?.remove('loading');
@@ -22,9 +26,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   })
 
   return (
-    <Layout>
-      <Component {...pageProps} />
-      <Analytics />
-    </Layout>
+
+    <SessionContextProvider supabaseClient={supabase} >
+      <Layout>
+        <Component {...pageProps} />
+        <Analytics />
+      </Layout>
+    </SessionContextProvider>
   );
 }

@@ -5,7 +5,7 @@ interface Props {
 
 export default function Index({count}: {count: number}) {
   return <>
-    <Hero />
+    <Hero idd='' summaryy='' />
   </>
 
 }

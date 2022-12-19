@@ -4,20 +4,29 @@ import { getResponseFromAI } from '@/utils/ai_wrapper';
 import { analyticsInstance } from '@/utils/analytics';
 import { fetchHN } from '@/utils/hacker_news_api';
 import { generatePromptToSummarize } from '@/utils/prompts';
-import React, { useState } from 'react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown';
 import { HNStory, HNStoryCurated } from 'types';
 import Button from '../Button';
 
-export default function Hero() {
+export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
     const [link, setLink] = useState("");
-    const [summary, setSummary] = useState("");
+    const [summary, setSummary] = useState(summaryy);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(false);
     const [numParagraphs, setNumParagraphs] = useState("1");
     const [numComments, setNumComments] = useState("5");
     const [commentDepth, setCommentDepth] = useState("s");
     const [fastMode, setFastMode] = useState(true);
+    const client = useSupabaseClient();
+
+    useEffect(() => {
+      if(idd!==""){
+        summarize(idd);
+      }
+    }, [idd])
+    
 
     async function fetchHNRecursively(item: string): Promise<any> {
         var data = await fetchHN(item);
@@ -36,13 +45,23 @@ export default function Hero() {
         return data;
     }
 
+    async function fetchFromDb(id: string) : Promise<any>{
+        const { data, error } = await client.from('hn-articles').select('*').eq('item', id);
+        if (data && data.length > 0) {
+            setSummary(data[0].summary);
+            setIsLoading(false);
+            return true;
+        }
+        return data;
+    }
+
 
     // where link is a Hacker News link
-    async function summarize() {
+    async function summarize(idd?:string) {
+        console.log("Summarize: ", idd)
         // make sure link is not empty, null or undefined
-        if (!link) return;
         // get the item id from a url like this https://news.ycombinator.com/item?id=34015953
-        const id = link.split('id=')[1];
+        const id = link.split('id=')[1] ?? idd;
         // make sure id is not empty, null or undefined
         if (!id) return;
         // set loading to true
@@ -51,6 +70,13 @@ export default function Hero() {
 
         let article: HNStory;
         if (fastMode) {
+
+            // check database for summary
+            const a = await fetchFromDb(id);
+            if (a === true) {
+                return;
+            }
+
             article = await fetchHN(id);
             // make sure article is not empty, null or undefined
             if (!article) return;
@@ -77,6 +103,17 @@ export default function Hero() {
                 fastMode: fastMode,
             });
             setSummary(summary);
+            setIsLoading(false)
+
+            // save on the supabase 'hn-articles' database
+            const { data, error } = await client.from('hn-articles').insert([
+                {
+                    item: id,
+                    summary: summary,
+                }]);
+
+
+
 
 
 
@@ -123,7 +160,7 @@ export default function Hero() {
                                     className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-hnorange bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-800"
 
                                 >
-                                    Summarize 
+                                    Summarize
                                 </Button>
 
                             </div>
@@ -143,7 +180,7 @@ export default function Hero() {
                 >
                     <ReactMarkdown className='prose text-black'>{summary === "" ? "Summary will appear here..." : summary}</ReactMarkdown>
                 </div>}
-                <p className='self-center text-center text-xs mt-1 text-gray-500'>Chrome extension coming soon...</p>
+                <p className='self-center text-center text-xs mt-1 text-gray-500'>Chrome extension coming soon (maybe)</p>
             </div>
         </div>
     );
