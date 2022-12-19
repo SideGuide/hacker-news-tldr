@@ -19,6 +19,7 @@ export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
     const [numComments, setNumComments] = useState("5");
     const [commentDepth, setCommentDepth] = useState("s");
     const [fastMode, setFastMode] = useState(true);
+    const [articleTitle , setArticleTitle] = useState("");
     const client = useSupabaseClient();
 
     useEffect(() => {
@@ -103,6 +104,7 @@ export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
                 fastMode: fastMode,
             });
             setSummary(summary);
+            setArticleTitle(article.title)
             setIsLoading(false);
             // set the query param to be the id
             window.history.pushState({}, '', `/${id}`);
@@ -111,6 +113,7 @@ export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
             const { data, error } = await client.from('hn-articles').insert([
                 {
                     item: id,
+                    title: article.title,
                     summary: summary,
                 }]);
 
@@ -180,6 +183,7 @@ export default function Hero({idd,summaryy}: {idd:string, summaryy: string}) {
                     placeholder="Output will appear here"
                 // value={output}
                 >
+                    <h3>{articleTitle}</h3>
                     <ReactMarkdown className='prose text-black'>{summary === "" ? "Summary will appear here..." : summary}</ReactMarkdown>
                 </div>}
                 <p className='self-center text-center text-xs mt-1 text-gray-500'>Chrome extension coming soon (maybe)</p>
